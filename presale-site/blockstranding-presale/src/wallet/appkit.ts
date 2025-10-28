@@ -15,36 +15,61 @@ const metadata = {
 let appKitClient: any;
 
 export function initAppKit() {
-  // 检测移动端
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
   appKitClient = createAppKit({
     adapters: [new EthersAdapter()],
     projectId,
     networks: [bsc],
     metadata,
     features: {
+      // 完全禁用社交登录
       email: false,
-      analytics: true,
+      socials: false,
+      emailShowWallets: false,
+      
+      // 钱包相关设置
       allWallets: true,
       collapseWallets: true,
+      connectMethodOrder: ['wallet'],
+      
+      // 其他功能
+      analytics: true,
       smartSessions: false,
       legalCheckbox: false,
       pay: false,
-      reownAuthentication: false,
-      socials: false,
-      connectMethodOrder: ['wallet'],
-      walletFeaturesOrder: ['receive', 'send']
+      reownAuthentication: false
     },
     themeMode: 'dark',
-    // 移动端优化
-    mobileWallets: isMobile ? [
-      'io.metamask',
-      'com.trustwallet.app',
-      'com.binance.dev',
-      'com.coinbase.wallet',
-      'me.rainbow'
-    ] : undefined
+    // 推荐钱包配置
+    recommendedWallets: [
+      {
+        id: 'com.binance.dev',
+        name: 'Binance Wallet',
+        image_id: 'binance',
+        mobile_link: 'https://www.binance.com/en/download',
+        desktop_link: 'https://www.binance.com/en/download'
+      },
+      {
+        id: 'com.okex.wallet',
+        name: 'OKX Wallet', 
+        image_id: 'okx',
+        mobile_link: 'https://www.okx.com/download',
+        desktop_link: 'https://www.okx.com/download'
+      },
+      {
+        id: 'io.metamask',
+        name: 'MetaMask',
+        image_id: 'metamask',
+        mobile_link: 'https://metamask.io/download/',
+        desktop_link: 'https://metamask.io/download/'
+      },
+      {
+        id: 'io.uniswap.wallet',
+        name: 'Uniswap Wallet',
+        image_id: 'uniswap',
+        mobile_link: 'https://wallet.uniswap.org/',
+        desktop_link: 'https://wallet.uniswap.org/'
+      }
+    ]
   });
 }
 
@@ -59,5 +84,3 @@ export function closeAppKitModal() {
     appKitClient.close();
   }
 }
-
-
