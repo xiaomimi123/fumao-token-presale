@@ -6,10 +6,9 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 // https://vitejs.dev/config/
 export default defineConfig({
   // GitHub Pages 配置
-  // 仓库名：fumao-token-presale
-  // 部署路径：presale-site/blockstranding-presale
-  // 最终访问路径：https://xiaomimi123.github.io/fumao-token-presale/presale-site/blockstranding-presale/
-  base: '/fumao-token-presale/presale-site/blockstranding-presale/',
+  // 由于 GitHub Actions 将 dist 内容部署到根目录
+  // 所以 base 路径应该是根路径
+  base: '/',
   plugins: [
     react(),
     nodePolyfills({
