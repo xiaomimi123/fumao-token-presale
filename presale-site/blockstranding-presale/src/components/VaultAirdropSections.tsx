@@ -31,6 +31,7 @@ export function VaultAirdropCard() {
   // 检查用户状态
   useEffect(() => {
     if (address && isConnected) {
+      console.log('🔍 开始检查用户状态:', { address, isConnected, chainId, isCorrectNetwork });
       checkUserStatus();
     }
   }, [address, isConnected]);
@@ -46,24 +47,39 @@ export function VaultAirdropCard() {
     if (!address) return;
     setCheckingStatus(true);
     
-    // 检查是否已领取
-    const claimed = await checkHasClaimed(address);
-    setHasClaimed(claimed);
-    
-    // 检查USDT授权状态
-    const approval = await checkUSDTApproval(address);
-    setApprovalStatus(approval);
-    
-    // 根据状态设置当前步骤
-    if (claimed) {
-      setCurrentStep(3); // 已完成
-    } else if (approval.approved) {
-      setCurrentStep(2); // 可以领取
-    } else {
-      setCurrentStep(1); // 需要授权
+    try {
+      console.log('🔍 检查用户状态 - 开始');
+      
+      // 检查是否已领取
+      console.log('🔍 检查是否已领取...');
+      const claimed = await checkHasClaimed(address);
+      console.log('🔍 领取状态:', claimed);
+      setHasClaimed(claimed);
+      
+      // 检查USDT授权状态
+      console.log('🔍 检查USDT授权状态...');
+      const approval = await checkUSDTApproval(address);
+      console.log('🔍 授权状态:', approval);
+      setApprovalStatus(approval);
+      
+      // 根据状态设置当前步骤
+      if (claimed) {
+        console.log('🔍 用户已领取，设置步骤为3');
+        setCurrentStep(3); // 已完成
+      } else if (approval.approved) {
+        console.log('🔍 用户已授权，设置步骤为2');
+        setCurrentStep(2); // 可以领取
+      } else {
+        console.log('🔍 用户需要授权，设置步骤为1');
+        setCurrentStep(1); // 需要授权
+      }
+      
+      console.log('🔍 用户状态检查完成');
+    } catch (error) {
+      console.error('❌ 检查用户状态失败:', error);
+    } finally {
+      setCheckingStatus(false);
     }
-    
-    setCheckingStatus(false);
   };
 
   const handleConnectWallet = () => {
@@ -187,6 +203,21 @@ export function VaultAirdropCard() {
                 </div>
                 <div className="text-xs">完成</div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Debug Info */}
+        {isConnected && (
+          <div className="bg-gray-800 p-4 rounded-lg mb-4 text-xs">
+            <div className="text-yellow-400 font-bold mb-2">🔍 调试信息 Debug Info:</div>
+            <div className="space-y-1 text-gray-300">
+              <div>地址: {address}</div>
+              <div>网络: {chainId} (正确: {isCorrectNetwork ? '是' : '否'})</div>
+              <div>当前步骤: {currentStep}</div>
+              <div>已领取: {hasClaimed ? '是' : '否'}</div>
+              <div>已授权: {approvalStatus.approved ? '是' : '否'}</div>
+              <div>授权额度: {approvalStatus.allowance}</div>
             </div>
           </div>
         )}
