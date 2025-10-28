@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { BrowserProvider, Contract, parseEther } from 'ethers';
 import { useWallet } from '../hooks/useWallet';
 import { useVaultAirdrop } from '../hooks/useVaultAirdrop';
 import { getContracts } from '../contracts/config';
@@ -53,12 +53,12 @@ export function AirdropAdminPage() {
     try {
       if (!window.ethereum) return;
       
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new BrowserProvider(window.ethereum);
       const contracts = getContracts();
       
       if (!contracts.vaultToken) return;
       
-      const vaultContract = new ethers.Contract(
+      const vaultContract = new Contract(
         contracts.vaultToken,
         VAULT_TOKEN_ABI,
         provider
@@ -114,17 +114,17 @@ export function AirdropAdminPage() {
     if (!confirmed) return;
 
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
       const contracts = getContracts();
       
-      const vaultContract = new ethers.Contract(
+      const vaultContract = new Contract(
         contracts.vaultToken,
         VAULT_TOKEN_ABI,
         signer
       );
       
-      const amountWei = ethers.utils.parseEther(newAmount);
+      const amountWei = parseEther(newAmount);
       const tx = await vaultContract.setAirdropAmount(amountWei);
       await tx.wait();
       
@@ -477,17 +477,17 @@ export function AirdropAdminPage() {
                     if (!confirmed) return;
 
                     try {
-                      const provider = new ethers.providers.Web3Provider(window.ethereum);
-                      const signer = provider.getSigner();
+                      const provider = new BrowserProvider(window.ethereum);
+                      const signer = await provider.getSigner();
                       const contracts = getContracts();
                       
-                      const vaultContract = new ethers.Contract(
+                      const vaultContract = new Contract(
                         contracts.vaultToken,
                         VAULT_TOKEN_ABI,
                         signer
                       );
                       
-                      const tx = await vaultContract.transfer(withdrawAddress, ethers.utils.parseEther(airdropInfo.remainingSupply));
+                      const tx = await vaultContract.transfer(withdrawAddress, parseEther(airdropInfo.remainingSupply));
                       await tx.wait();
                       
                       alert('✅ 代币已提取！');
