@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { BrowserProvider } from 'ethers';
 import { getContracts } from '../contracts/config';
 
-// AppKit 会自动处理 BSC 网络配置
-
 export function useWallet() {
   const [address, setAddress] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -19,7 +17,69 @@ export function useWallet() {
     console.log('网络状态:', { chainId, expectedChainId: contracts.chainId, isCorrect: chainId === contracts.chainId });
   }, [chainId, contracts.chainId]);
 
-  // AppKit 会自动处理钱包连接状态，这里不需要手动检查
+  // 监听钱包连接状态变化
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      if (window.ethereum) {
+        try {
+          const provider = new BrowserProvider(window.ethereum);
+          const accounts = await provider.listAccounts();
+          const network = await provider.getNetwork();
+          
+          if (accounts.length > 0) {
+            setAddress(accounts[0].address);
+            setIsConnected(true);
+            setChainId(Number(network.chainId));
+            console.log('钱包已连接:', accounts[0].address);
+            console.log('当前网络:', network.name, 'ChainId:', network.chainId);
+          } else {
+            setAddress(null);
+            setIsConnected(false);
+            setChainId(null);
+            console.log('钱包未连接');
+          }
+        } catch (error) {
+          console.error('检查钱包连接失败:', error);
+          setAddress(null);
+          setIsConnected(false);
+          setChainId(null);
+        }
+      }
+    };
+
+    // 初始检查
+    checkWalletConnection();
+
+    // 监听账户变化
+    const handleAccountsChanged = (accounts: string[]) => {
+      if (accounts.length > 0) {
+        setAddress(accounts[0]);
+        setIsConnected(true);
+        console.log('账户已切换:', accounts[0]);
+      } else {
+        setAddress(null);
+        setIsConnected(false);
+        console.log('钱包已断开');
+      }
+    };
+
+    // 监听网络变化
+    const handleChainChanged = (chainId: string) => {
+      const newChainId = parseInt(chainId, 16);
+      setChainId(newChainId);
+      console.log('网络已切换:', newChainId);
+    };
+
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        window.ethereum?.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum?.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, []);
 
   const connectWallet = async () => {
     // 使用 AppKit 打开钱包选择弹窗
@@ -33,15 +93,20 @@ export function useWallet() {
   };
 
   const disconnect = async () => {
-    // 使用 AppKit 断开连接
     try {
-      const { closeAppKitModal } = await import('../wallet/appkit');
-      closeAppKitModal();
-    } catch (error) {
-      console.error('AppKit 断开连接失败:', error);
-      // 如果 AppKit 不可用，至少重置本地状态
+      // 重置本地状态
       setAddress(null);
       setIsConnected(false);
+      setChainId(null);
+      
+      // 尝试通过 AppKit 断开连接
+      const { closeAppKitModal } = await import('../wallet/appkit');
+      closeAppKitModal();
+      
+      console.log('钱包已断开连接');
+    } catch (error) {
+      console.error('断开连接失败:', error);
+      // 即使 AppKit 断开失败，本地状态也已经重置
     }
   };
 
