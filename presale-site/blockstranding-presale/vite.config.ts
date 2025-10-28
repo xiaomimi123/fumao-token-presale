@@ -5,11 +5,11 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // GitHub Pages 仓库名：/fumao-token-presale/
-  // 子应用路径：/presale-site/blockstranding-presale/
-  // Pages 最终访问路径：/<repo>/<subdir>/
-  // 将 base 设为相对路径，确保二级目录部署也能正常加载静态资源
-  base: './',
+  // GitHub Pages 配置
+  // 仓库名：fumao-token-presale
+  // 部署路径：presale-site/blockstranding-presale
+  // 最终访问路径：https://xiaomimi123.github.io/fumao-token-presale/presale-site/blockstranding-presale/
+  base: '/fumao-token-presale/presale-site/blockstranding-presale/',
   plugins: [
     react(),
     nodePolyfills({

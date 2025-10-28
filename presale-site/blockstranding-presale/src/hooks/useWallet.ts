@@ -20,30 +20,43 @@ export function useWallet() {
   // 监听钱包连接状态变化
   useEffect(() => {
     const checkWalletConnection = async () => {
+      console.log('🔍 检查钱包连接状态...');
+      console.log('window.ethereum 存在:', !!window.ethereum);
+      
       if (window.ethereum) {
         try {
+          console.log('🔍 创建 BrowserProvider...');
           const provider = new BrowserProvider(window.ethereum);
+          console.log('🔍 获取账户列表...');
           const accounts = await provider.listAccounts();
+          console.log('🔍 账户列表:', accounts);
+          console.log('🔍 获取网络信息...');
           const network = await provider.getNetwork();
+          console.log('🔍 网络信息:', network);
           
           if (accounts.length > 0) {
             setAddress(accounts[0].address);
             setIsConnected(true);
             setChainId(Number(network.chainId));
-            console.log('钱包已连接:', accounts[0].address);
-            console.log('当前网络:', network.name, 'ChainId:', network.chainId);
+            console.log('✅ 钱包已连接:', accounts[0].address);
+            console.log('✅ 当前网络:', network.name, 'ChainId:', network.chainId);
           } else {
             setAddress(null);
             setIsConnected(false);
             setChainId(null);
-            console.log('钱包未连接');
+            console.log('❌ 钱包未连接 - 没有账户');
           }
         } catch (error) {
-          console.error('检查钱包连接失败:', error);
+          console.error('❌ 检查钱包连接失败:', error);
           setAddress(null);
           setIsConnected(false);
           setChainId(null);
         }
+      } else {
+        console.log('❌ window.ethereum 不存在');
+        setAddress(null);
+        setIsConnected(false);
+        setChainId(null);
       }
     };
 
