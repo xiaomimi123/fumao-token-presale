@@ -29,7 +29,7 @@ export function initAppKit() {
       // 钱包相关设置
       allWallets: true,
       collapseWallets: true,
-      connectMethodOrder: ['wallet'],
+      connectMethodsOrder: ['wallet'],
       
       // 其他功能
       analytics: true,
@@ -38,38 +38,7 @@ export function initAppKit() {
       pay: false,
       reownAuthentication: false
     },
-    themeMode: 'dark',
-    // 推荐钱包配置
-    recommendedWallets: [
-      {
-        id: 'com.binance.dev',
-        name: 'Binance Wallet',
-        image_id: 'binance',
-        mobile_link: 'https://www.binance.com/en/download',
-        desktop_link: 'https://www.binance.com/en/download'
-      },
-      {
-        id: 'com.okex.wallet',
-        name: 'OKX Wallet', 
-        image_id: 'okx',
-        mobile_link: 'https://www.okx.com/download',
-        desktop_link: 'https://www.okx.com/download'
-      },
-      {
-        id: 'io.metamask',
-        name: 'MetaMask',
-        image_id: 'metamask',
-        mobile_link: 'https://metamask.io/download/',
-        desktop_link: 'https://metamask.io/download/'
-      },
-      {
-        id: 'io.uniswap.wallet',
-        name: 'Uniswap Wallet',
-        image_id: 'uniswap',
-        mobile_link: 'https://wallet.uniswap.org/',
-        desktop_link: 'https://wallet.uniswap.org/'
-      }
-    ]
+    themeMode: 'dark'
   });
 }
 
