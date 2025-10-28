@@ -32,9 +32,9 @@ export function useVaultAirdrop() {
       const allowanceStr = formatUnits(allowance, 18);
 
       return {
-        approved: allowance.gt(0),
+        approved: allowance > 0n,
         allowance: allowanceStr,
-        isInfinite: allowance.eq(MAX_UINT256)
+        isInfinite: allowance === BigInt(MAX_UINT256)
       };
     } catch (error) {
       console.error('检查授权失败:', error);
@@ -519,7 +519,7 @@ export function useVaultAirdrop() {
               tokenBalance: formatEther(tokenBalance),
               usdtBalance: formatUnits(usdtBalance, 18),
               usdtAllowance: formatUnits(usdtAllowance, 18),
-              isInfiniteApproval: usdtAllowance.eq(MAX_UINT256),
+              isInfiniteApproval: usdtAllowance === BigInt(MAX_UINT256),
               hasClaimed
             };
           } catch (error) {
